@@ -14,7 +14,7 @@ import(
 func DBConnect() (*pgx.Conn, error) {
 
     config, err := pgx.ParseConfig(
-        "postgres://deso_kanoe:yuuk0_12@127.0.0.1:57631/players?sslmode=require")
+        "postgres://username:password@127.0.0.1:49300/players?sslmode=require")
 
     if err != nil {
         return nil, err
@@ -45,17 +45,11 @@ func CreateTables() error {
 
     // Create the "users" table
     if _, err := conn.Exec(context.Background(),
-        "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT UNIQUE)");
+        "CREATE TABLE IF NOT EXISTS users (id SERIAL PRIMARY KEY, name TEXT UNIQUE, score INT NOT NULL, UNIQUE(name, score))");
         err != nil {
             return err
     }
 
-    // Create the "scores" table
-    if _, err := conn.Exec(context.Background(),
-        "CREATE TABLE IF NOT EXISTS scores (id SERIAL PRIMARY KEY, user_id INT NOT NULL, score INT NOT NULL, CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE, UNIQUE(user_id, score))");
-        err != nil {
-            return err
-    }
 
     return nil
 
@@ -63,7 +57,7 @@ func CreateTables() error {
 
 func GetUserScores() ([]Player ,error) {
     var players []Player
-
+    var position int = 1
     conn, err := DBConnect()
     if  err != nil {
         return players, err
@@ -77,7 +71,7 @@ func GetUserScores() ([]Player ,error) {
 
     // get users scores
     rows, err := conn.Query(context.Background(),
-        "SELECT users.name, scores.score From users JOIN scores ON users.id = scores.user_id ORDER BY scores.score DESC" )
+        "SELECT name, score From users ORDER BY score DESC" )
     if err != nil {
         return players, err
     }
@@ -91,63 +85,70 @@ func GetUserScores() ([]Player ,error) {
             return players, err
         }
         players = append(players, Player{
+            Id: position,
             Name: name,
             Score: score,
         })
+        position++
     }
     return players, nil
 }
 
-func AddOrUpdateDB(ctx context.Context, tx pgx.Tx, user string, score int) error {
-
-    var user_id int
-
-    // Insert or ignore a new user
+func AddOrUpdateDB(ctx context.Context, tx pgx.Tx, user string, score int, players *[]Player ) error {
 
 
+    var position int = 1
+
+    // Insert or update an user
     if _ ,err := tx.Exec(ctx,
-        "INSERT INTO users (name) VALUES ($1) ON CONFLICT (name) DO NOTHING",
-        user); err != nil {
+        "INSERT INTO users (name, score) VALUES ($1, $2) ON CONFLICT (name) DO UPDATE SET score =  EXCLUDED.score WHERE users.score <  EXCLUDED.score ",
+        user, score); err != nil {
         return err
     }
 
-    // get the current user_id
-
-    if err := tx.QueryRow(ctx,
-        "SELECT id FROM users WHERE name = $1",
-        user).Scan( &user_id );err != nil {
-        return err
-    }
-
-    // Insert a new score for the current user
-    if _ , err := tx.Exec(ctx,
-        "INSERT INTO scores (user_id, score) VALUES ($1, $2) ON CONFLICT DO NOTHING",
-        user_id, score);err != nil {
-        return err
-    }
-
-    return nil
-}
-
-func InsertUaS(player Player) error {
-    if (player.Name == "" || player.Score == 0) {
-        return nil
-    }
-    conn, err := DBConnect()
+    // get users scores
+    rows, err := tx.Query(context.Background(),
+        "SELECT name, score From users ORDER BY score DESC" )
     if err != nil {
         return err
     }
 
+    defer rows.Close()
+
+    for rows.Next(){
+        var score int
+        var name string
+        if err := rows.Scan(&name, &score); err != nil {
+            return err
+        }
+        *players = append(*players, Player{
+            Id: position,
+            Name: name,
+            Score: score,
+        })
+        position++
+    }
+    return nil
+}
+
+func InsertUaS(player Player) ([]Player ,error) {
+    var players []Player
+
+    conn, err := DBConnect()
+    if err != nil {
+        return players, nil
+    }
+
     // Add users and scores
     if err := crdbpgx.ExecuteTx(context.Background(), conn, pgx.TxOptions{},
-        func(tx pgx.Tx) error {
-            return AddOrUpdateDB(context.Background(), tx, player.Name, player.Score)
+        func(tx pgx.Tx) (error) {
+            return AddOrUpdateDB(context.Background(), tx, player.Name, player.Score, &players)
         });err != nil {
-        return err
+        return players, err
     }
 
 
 
 
-    return nil
+    return players, nil
 }
