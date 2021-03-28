@@ -1,22 +1,22 @@
 # snakeg_test
 
+# <img alt="died" src="/back/static/woof.png"/>
+
 ## Description
 
 Woof is a game based on the snake game, but it differs in two points. The first is that in this game you collect gems instead of apples and when you collect a red gem (which is like a ruby) your length decreases by 2, this is normally good but if your length is lees than or equal to 2 it's game over for you. The other difference are the bombs, these elements move around the map and every time you collect 10 gems, one of them spawns. Be careful with this because if you collide with them you may die.
 
 ## Project setup
 
-To run this project you need install  the 'go' compiler
-
-```
+To run this project you need install  the 'go' compiler:
+``
 https://golang.org/dl/
-```
+``
 
-The CockroachDB binary
-````
+The CockroachDB binary:
+``
 https://www.cockroachlabs.com/docs/v20.2/install-cockroachdb-windows.html
-
-````
+``
 
 
 ## Run the whole project
@@ -42,10 +42,10 @@ in this example, the port number is `61011`, *in your case may be different*. Yo
 
 ###### Run the go code
 
-1. In the project folder, go to the route **back/db** and open the **cockroach.go** file.
+1. In the project folder, go to the route **``back/db``** and open the **cockroach.go** file.
 
 2. Change ``49300`` to the port number you got from  **(sql/tcp)**
-```
+```go
 func DBConnect() (*pgx.Conn, error) {
 
     config, err := pgx.ParseConfig(
@@ -67,7 +67,22 @@ func DBConnect() (*pgx.Conn, error) {
 }
 ```
 
-3. go back to the **back** folder and run the code with the following command:
-```
+3. Go back to the **back** folder and run the code with the following command:</br>
+``
 go run api.go
-```
+``
+4. Open your browser and go to:</br>
+``
+localhost:5000
+``
+
+## Screenshots
+# <img alt="home_page" src="/Screenshots/home_page.png"/>
+
+# <img alt="playing" src="/Screenshots/playing.png"/>
+
+# <img alt="ruby" src="/Screenshots/ruby.png"/>
+
+# <img alt="died" src="/Screenshots/died.png"/>
+
+# <img alt="about_page" src="/Screenshots/about_page.png"/>
