@@ -85,4 +85,4 @@ localhost:5000
 
 # <img alt="died" src="/Screenshots/died.png"/>
 
-# <img alt="about_page" src="/Screenshots/about_page.png"/>
+# <img alt="about" src="/Screenshots/about.png"/>
