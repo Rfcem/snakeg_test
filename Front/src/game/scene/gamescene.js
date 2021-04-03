@@ -67,20 +67,16 @@ export default class GameScene extends Phaser.Scene{
    }
 
    update(time){
-       // if(this.cursors.left.isDown){
-       //     const event = new Event('build');
-       //     event.score = this.score
-       //
-       //    const cb = document.getElementById(this.containerId);
-       //    cb.dispatchEvent(event);
-       // }
+
+       // End the game when Woof is dead
        if (!this.woof.alive)
        {
+           this.physics.pause();
+           // Create an evet to send the last score to the UI
            const event = new Event('dead');
            event.score = this.score
            const cb = document.getElementById(this.containerId);
            cb.dispatchEvent(event);
-           this.physics.pause();
 
            return;
        }
@@ -119,16 +115,18 @@ export default class GameScene extends Phaser.Scene{
                    this.score += 10 + 3 * this.bombs.getLength();
                }else{
 
-                   this.score += 20 + 3 * this.bombs.getLength();
+                   this.score += 20 + 4 * this.bombs.getLength();
                }
-
+               // create an event to update the player's score
                 const event = new Event('take');
                 event.score = this.score
                 const cb = document.getElementById(this.containerId);
                 cb.dispatchEvent(event);
 
-               placeANewDiamond(this, this.woof, this.diamond);
+               placeANewDiamond(this.woof, this.diamond);
 
+               // Checks if the number of diamonds taken is divisible by 10
+               // if so, place a new bomb.
                if (this.diamond.total %10 === 0) {
                    let x = ( this.woof.head.x <400 )? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
                    let bomb = this.bombs.create(x, 16, "bomb");
@@ -157,11 +155,11 @@ export default class GameScene extends Phaser.Scene{
 * If there aren't any locations left, they've won!
 *
 */
-function placeANewDiamond(game, woof, diamond) {
+function placeANewDiamond( woof, diamond) {
     //  First create an array that assumes all positions
-    //  are valid for the new piece of food
+    //  are valid for the new diamond
 
-    //  A Grid we'll use to reposition the food each time it's eaten
+    //  A Grid we'll use to reposition the diamond each time it's taken
     var testGrid = [];
 
     for (var y = 0; y < 19; y++)
@@ -185,7 +183,7 @@ function placeANewDiamond(game, woof, diamond) {
         {
             if (testGrid[y][x] === true)
             {
-                //  Is this position valid for food? If so, add it here ...
+                //  Is this position valid for a diamond? If so, add it here ...
                 validLocations.push({ x: x, y: y });
             }
         }
@@ -193,7 +191,7 @@ function placeANewDiamond(game, woof, diamond) {
 
     if (validLocations.length > 0)
     {
-        //  Use the RNG to pick a random food position
+        //  Use the RNG to pick a random diamond position
         var pos = Phaser.Math.RND.pick(validLocations);
 
         //  And place it
