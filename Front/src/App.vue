@@ -158,22 +158,34 @@ export default {
             this.currentPlayer.score = score;
         },
         async sendScore(){
+            let playerPreviousInfo;
+            let playerCurrentInfo;
 
+
+            playerCurrentInfo = this.currentPlayer;
+
+            // Search the current player in the actual list of players
+            playerPreviousInfo = this.TopPlayers.find(
+                (player) => player.name === playerCurrentInfo.name
+            );
+
+            if (typeof playerPreviousInfo !== "undefined" && playerPreviousInfo.score >= playerCurrentInfo.score) {
+                // if the player's current score is lower than the previous one, do nothing
+                return;
+            }
 
             const res = await fetch("api/TopPlayers", {
                     method: "POST",
                     headers : {
                         "content-type": "application/json",
                     },
-                    body: JSON.stringify(this.currentPlayer)
+                    body: JSON.stringify(playerCurrentInfo)
                 }
             );
 
             const data = await res.json();
+            this.TopPlayers = data;
 
-            if (this.TopPlayers.length < 100 || typeof  this.TopPlayers.find( (player) => player.score <= this.currentPlayer.score ) !== "undefined" ){
-                this.TopPlayers = data;
-            }
         }
     },
     async created(){

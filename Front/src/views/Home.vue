@@ -51,7 +51,7 @@ export default {
               btn: "Play Again",
               name: this.playerName
           };
-           this.playingGame = false;
+          this.playingGame = false;
           this.gameInstance.destroy(true);
           this.gameInstance = null;
           this.$emit("died")
