@@ -184,12 +184,13 @@ export default {
             );
 
             const data = await res.json();
-            this.TopPlayers = data;
+            this.TopPlayers = (typeof data !== "undefined" && data !== null)? data : this.TopPlayers
 
         }
     },
     async created(){
-        this.TopPlayers = await this.fetchTopPlayers()
+        let data = await this.fetchTopPlayers()
+        this.TopPlayers = (typeof data !== "undefined" && data !== null)? data : []
     }
 };
 </script>
