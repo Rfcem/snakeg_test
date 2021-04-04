@@ -4,7 +4,7 @@
 
 ## Description
 
-Woof is a game based on the snake game, but it differs in two points. The first is that in this game you collect gems instead of apples and when you collect a red gem (which is like a ruby) your length decreases by 2, this is normally good but if your length is lees than or equal to 2 it's game over for you. The other difference are the bombs, these elements move around the map and every time you collect 10 gems, one of them spawns. Be careful with this because if you collide with them you may die.
+Woof is a game based on the snake game, but it differs in two points. The first is that in this game you collect gems instead of apples and when you collect a red gem (which is like a ruby) your length decreases by 2, this is normally good but if your length is less or equal than 2 it's game over. The other difference are the bombs, these elements move around the map and every time you collect 10 gems, one of them spawns. Be careful with this because if you collide with them you may die.
 
 ## Project setup
 
@@ -19,7 +19,7 @@ https://www.cockroachlabs.com/docs/v20.2/install-cockroachdb-windows.html
 ``
 
 
-## Run the whole project
+## Running the project
 
 ##### First you need to create a database following the next steps:
 
@@ -40,16 +40,16 @@ in this example, the port number is `61011`, *in your case may be different*. Yo
 ``GRANT ALL ON DATABASE players TO username;``</br>
 
 
-###### Run the go code
+##### Running the go code
 
 1. In the project folder, go to the route **``back/db``** and open the **cockroach.go** file.
 
-2. Change ``49300`` to the port number you got from  **(sql/tcp)**
+2. Change ``<db_port_number>`` to the port number you got from  **(sql/tcp)**
 ```go
 func DBConnect() (*pgx.Conn, error) {
 
     config, err := pgx.ParseConfig(
-        "postgres://username:password@127.0.0.1:49300/players?sslmode=require")
+        "postgres://username:password@127.0.0.1:<db_port_number>/players?sslmode=require")
 
     if err != nil {
         return nil, err
