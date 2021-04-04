@@ -17,12 +17,16 @@ func NewPlayerPost() http.HandlerFunc {
             players, err := db.GetUserScores()
             if err != nil {
                 fmt.Println(err)
+                http.Error(w, "[]", http.StatusTeapot)
+		        return
             }
             json.NewEncoder(w).Encode(players)
         } else {
             players, err := db.InsertUaS(player1)
             if err != nil {
                 fmt.Println(err)
+                http.Error(w, "[]", http.StatusInternalServerError)
+		        return
             }
             json.NewEncoder(w).Encode(players)
         }

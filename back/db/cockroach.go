@@ -136,7 +136,7 @@ func InsertUaS(player Player) ([]Player ,error) {
 
     conn, err := DBConnect()
     if err != nil {
-        return players, nil
+        return players, err
     }
 
     // Add users and scores
