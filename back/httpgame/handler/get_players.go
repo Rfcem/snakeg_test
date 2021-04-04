@@ -7,6 +7,7 @@ import(
     "net/http"
     "snakeg/db"
 
+
 )
 
 func TopPlayersGet() http.HandlerFunc {
@@ -14,6 +15,8 @@ func TopPlayersGet() http.HandlerFunc {
     		players, err := db.GetUserScores()
             if err != nil {
                 fmt.Println(err)
+                http.Error(w, "[]", http.StatusInternalServerError)
+		        return
             }
             json.NewEncoder(w).Encode(players)
 	}
